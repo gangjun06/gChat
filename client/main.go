@@ -10,6 +10,7 @@ import (
 
 func main() {
 	go db.InitDB()
+	defer db.CloseDB()
 
 	a := app.NewWithID("dev.gangjun.gchat.client")
 	w := a.NewWindow("gChat")

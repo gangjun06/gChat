@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne"
 	"fyne.io/fyne/dialog"
 	"fyne.io/fyne/widget"
+	"github.com/gangjun06/gChat/client/services"
 )
 
 func AddServerDialog(w fyne.Window) {
@@ -23,6 +24,6 @@ func AddServerDialog(w fyne.Window) {
 		if !b {
 			return
 		}
-
+		services.ServerView.AddItem(inputName.Text, inputAddress.Text)
 	}, w)
 }

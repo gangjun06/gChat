@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/theme"
 	"fyne.io/fyne/widget"
@@ -12,6 +13,7 @@ func main() {
 	a.Settings().SetTheme(theme.LightTheme())
 
 	w := a.NewWindow("gChat - Server")
+	w.Resize(fyne.NewSize(600, 300))
 
 	tabs := widget.NewTabContainer(
 		widget.NewTabItemWithIcon("Home", theme.HomeIcon(), screen.HomeScreen(a)),

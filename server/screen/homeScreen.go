@@ -15,6 +15,9 @@ func HomeScreen(a fyne.App) fyne.CanvasObject {
 	inputIP := widget.NewEntry()
 	inputIP.Disable()
 
+	info := widget.NewLabel("")
+	serverOn := false
+
 	// Get my IP
 	go func(entry *widget.Entry) {
 		var ipInfo map[string]interface{}
@@ -26,6 +29,7 @@ func HomeScreen(a fyne.App) fyne.CanvasObject {
 	}(inputIP)
 
 	inputPort := widget.NewEntry()
+	inputPort.SetText("8080")
 	inputPort.SetPlaceHolder("Enter Chatapp Port")
 
 	formServe := &widget.Form{
@@ -33,19 +37,20 @@ func HomeScreen(a fyne.App) fyne.CanvasObject {
 			{Text: "YourIP", Widget: inputIP},
 			{Text: "Port", Widget: inputPort},
 		},
-		OnCancel: func() {
-			ws.Stop()
-		},
 		OnSubmit: func() {
-			err := ws.Serve(inputPort.Text)
-			if err != nil {
+			if serverOn {
+				return
 			}
+			serverOn = true
+			info.SetText("Server is started. Check the log.")
+			go ws.Serve(inputPort.Text)
 		},
-		CancelText: "Stop",
+		CancelText: "",
 		SubmitText: "Start Server",
 	}
 
 	return widget.NewVBox(
+		info,
 		formServe,
 	)
 }

@@ -1,17 +1,25 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"fyne.io/fyne/app"
+	"fyne.io/fyne/theme"
+	"fyne.io/fyne/widget"
+	"github.com/gangjun06/gChat/server/screen"
 )
 
 func main() {
-	server, err := socketio.NewServer(nil)
+	a := app.NewWithID("dev.gangjun.gchat.server")
+	a.Settings().SetTheme(theme.LightTheme())
 
-	if err != nil {
-		log.Fatalln(err)
-	}
+	w := a.NewWindow("gChat - Server")
 
-	http.Handle("/ws", server)
-	log.Fatalln(http.ListenAndServe(":5000", nil))
+	tabs := widget.NewTabContainer(
+		widget.NewTabItemWithIcon("Home", theme.HomeIcon(), screen.HomeScreen(a)),
+		widget.NewTabItemWithIcon("Log", theme.FileTextIcon(), screen.LogScreen(a)),
+	)
+
+	tabs.SetTabLocation(widget.TabLocationLeading)
+	w.SetContent(tabs)
+
+	w.ShowAndRun()
 }

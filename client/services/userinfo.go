@@ -13,4 +13,5 @@ func SetUserInfo(username, avatar string) {
 	data.Username = username
 	data.Avatar = avatar
 	db.DB().Save(&data)
+	ServerView.Refresh()
 }

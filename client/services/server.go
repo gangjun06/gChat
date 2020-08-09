@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"log"
 
 	"fyne.io/fyne"
@@ -24,6 +23,7 @@ func SetServerView(layout *widget.Box) {
 
 func (s *ServerInfo) Refresh() {
 	var data []db.ServerInfo
+	userinfo := GetUserInfo()
 	result := db.DB().Find(&data)
 	if result.Error != nil {
 		log.Fatalln(result.Error)
@@ -35,19 +35,27 @@ func (s *ServerInfo) Refresh() {
 
 	for _, info := range *s.Info {
 		id := info.ID
+		address := info.Address
+		name := info.Name
 		infobox := widget.NewHBox(widget.NewLabel(info.Name), layout.NewSpacer(), widget.NewLabel(info.Address))
 		actionbox := widget.NewHBox(layout.NewSpacer(), widget.NewButton("Delete", func() {
 			s.DeleteItem(id)
 		}), widget.NewButton("Open", func() {
+			labelLog := widget.NewLabel("Start Chatting(" + name + ")\n")
+
+			socket := NewSocket(address, "8080", &userinfo, labelLog)
+			go socket.Connect()
+
 			w := fyne.CurrentApp().NewWindow("Chat Detail")
 			w.Resize(fyne.NewSize(360, 560))
-			labelLog := widget.NewLabel("")
+
 			labelLog.Wrapping = fyne.TextWrapWord
 			labelLogScroller := widget.NewVScrollContainer(labelLog)
 			entry := widget.NewEntry()
 
 			btnSend := widget.NewButton("Send", func() {
-				fmt.Println(entry.Text)
+				socket.Send(entry.Text)
+				entry.SetText("")
 			})
 
 			bottomLayout := layout.NewBorderLayout(nil, nil, nil, btnSend)
@@ -61,6 +69,7 @@ func (s *ServerInfo) Refresh() {
 			w.SetContent(fyne.NewContainerWithLayout(
 				borderLayout, bottom, labelLogScroller))
 			w.Show()
+
 		}))
 		box := widget.NewVBox(infobox, actionbox)
 		s.Layout.Append(box)

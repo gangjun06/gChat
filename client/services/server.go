@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 
 	"fyne.io/fyne"
@@ -16,8 +17,8 @@ type ServerInfo struct {
 
 var ServerView *ServerInfo
 
-func SetServerView(Layout *widget.Box) {
-	ServerView = &ServerInfo{Layout: Layout}
+func SetServerView(layout *widget.Box) {
+	ServerView = &ServerInfo{Layout: layout}
 	ServerView.Refresh()
 }
 
@@ -38,6 +39,28 @@ func (s *ServerInfo) Refresh() {
 		actionbox := widget.NewHBox(layout.NewSpacer(), widget.NewButton("Delete", func() {
 			s.DeleteItem(id)
 		}), widget.NewButton("Open", func() {
+			w := fyne.CurrentApp().NewWindow("Chat Detail")
+			w.Resize(fyne.NewSize(360, 560))
+			labelLog := widget.NewLabel("")
+			labelLog.Wrapping = fyne.TextWrapWord
+			labelLogScroller := widget.NewVScrollContainer(labelLog)
+			entry := widget.NewEntry()
+
+			btnSend := widget.NewButton("Send", func() {
+				fmt.Println(entry.Text)
+			})
+
+			bottomLayout := layout.NewBorderLayout(nil, nil, nil, btnSend)
+			bottom := fyne.NewContainerWithLayout(
+				bottomLayout,
+				btnSend,
+				entry,
+			)
+
+			borderLayout := layout.NewBorderLayout(nil, bottom, nil, nil)
+			w.SetContent(fyne.NewContainerWithLayout(
+				borderLayout, bottom, labelLogScroller))
+			w.Show()
 		}))
 		box := widget.NewVBox(infobox, actionbox)
 		s.Layout.Append(box)
